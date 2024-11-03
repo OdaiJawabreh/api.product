@@ -24,12 +24,23 @@ export class Product {
   @DeleteDateColumn({ nullable: false, select: true, type: "timestamp" })
   deleted_at: Date;
 
-  @Column({ type: "varchar", nullable: false, default: "" })
+  @Column({ type: "varchar", nullable: false, default: "", length: 255 })
   name: string;
 
-  @Column({ type: "float", nullable: false, default: 0.0 })
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
+  @Column({ type: 'varchar', length: 100 })
+  category: string;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 
-  @Column({ type: "float", nullable: false, default: 0.0 })
+  @Column({ type: 'varchar', length: 50, unique: true })
+  sku: string;
+
+  @Column({ type: 'int', default: 0 })
   stock: number;
+
+  
 }
