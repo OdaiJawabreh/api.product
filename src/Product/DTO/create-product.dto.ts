@@ -8,7 +8,7 @@ export class CreateProductDto {
   })
   @IsNotEmpty()
   @IsString()
-  readonly name: string;
+   name: string;
 
   @ApiProperty({
     example: 20.99,
@@ -16,7 +16,7 @@ export class CreateProductDto {
   })
   @IsNotEmpty()
   @IsNumber()
-  readonly price: number;
+   price: number;
 
   @ApiProperty({
     example: 9,
@@ -24,5 +24,5 @@ export class CreateProductDto {
   })
   @IsNotEmpty()
   @IsInt()
-  readonly stock: number;
-}
+   stock: number;
+};

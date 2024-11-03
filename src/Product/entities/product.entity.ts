@@ -31,5 +31,5 @@ export class Product {
   price: number;
 
   @Column({ type: "float", nullable: false, default: 0.0 })
-  stockQuantity: number;
+  stock: number;
 }
