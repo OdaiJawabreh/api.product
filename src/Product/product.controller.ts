@@ -1,28 +1,48 @@
-import { Controller } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
 import { GrpcMethod } from "@nestjs/microservices";
 import { Product } from "./entities/product.entity";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateProductDto } from "./DTO/create-product.dto";
-import { ProductResponse } from "./DTO/create-product.response";
+import { ProductService } from "./product.service";
+import { FailureResponse } from "src/classes";
 
 @Controller("product")
 export class ProductController {
-  constructor(
-    @InjectRepository(Product)
-    private productRepository: Repository<Product>
-  ) {}
 
-  @GrpcMethod("ProductService", "CreateProduct")
-  async create(data: CreateProductDto): Promise<ProductResponse> {
-    const product = this.productRepository.create(data);
-    const savedProduct = await this.productRepository.save(product);
+  constructor(private readonly productService: ProductService) {}
 
-    return {
-      id: savedProduct.id,
-      name: savedProduct.name,
-      price: savedProduct.price,
-      stock: savedProduct.stock,
-    };
+  @Post()
+  create(@Body() createProductDto: Partial<CreateProductDto>){
+    return this.productService.create(createProductDto);
   }
+
+
+  @Get()
+  getAllProducts(
+    @Query('limit') limit?: number,
+    @Query('offset') offset?: number,
+    @Query('key') key?: string,
+  ){
+    return this.productService.getAllProducts(limit, offset, key);
+  }
+
+  @Get('/:id')
+  getProduct(
+    @Param('id') id: string,
+  ){
+    return this.productService.getProduct(+id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() createProductDto: Partial<CreateProductDto>) {
+    return this.productService.update(+id, createProductDto);
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.productService.delete(+id);
+  }
+
+ 
 }

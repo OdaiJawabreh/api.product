@@ -21,7 +21,7 @@ export class Product {
   })
   updated_at: Date;
 
-  @DeleteDateColumn({ nullable: false, select: true, type: "timestamp" })
+  @DeleteDateColumn({ nullable: false, select: true, type: Date })
   deleted_at: Date;
 
   @Column({ type: "varchar", nullable: false, default: "", length: 255 })
@@ -41,6 +41,4 @@ export class Product {
 
   @Column({ type: 'int', default: 0 })
   stock: number;
-
-  
 }
