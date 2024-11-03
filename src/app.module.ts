@@ -16,7 +16,7 @@ dotenv.config();
       password: process.env.DB_PASSWORD,
       poolSize: 1,
       database: process.env.DB_NAME,
-      synchronize: false,
+      synchronize: true,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
     }),
     ProductModule,
