@@ -6,7 +6,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { CreateProductDto } from "./DTO/create-product.dto";
 import { ProductService } from "./product.service";
 import { FailureResponse } from "src/classes";
-import { CreateProductRequestWithOrdersDto } from "./DTO/micro-scrives.dto";
+import { CreateOrderCheckAndUpdateProductRequest, CreateProductRequestWithOrdersDto } from "./DTO/micro-scrives.dto";
 
 @Controller("product")
 export class ProductController {
@@ -44,7 +44,11 @@ export class ProductController {
 
   @GrpcMethod("ProductService", "GetProductsByIds")
   async GetProductsByIds(data: { ids: number[] }) {
-    const x = await this.productService.GetProductsByIds(data);
-    return x;
+    return await this.productService.GetProductsByIds(data);
+  }
+
+  @GrpcMethod("ProductService", "CreateOrderWithCheckProductUndUpdate")
+  async CreateOrderWithCheckProductUndUpdate(data: CreateOrderCheckAndUpdateProductRequest) {
+    return await this.productService.CreateOrderWithCheckProductUndUpdate(data);
   }
 }

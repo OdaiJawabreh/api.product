@@ -34,6 +34,26 @@ export class ProductData {
   sku: string;
   stock: number;
 }
-  
+
+
+export class CreateOrderCheckAndUpdateProductRequest {
+  orderItems: Item[]  
+}
+
+export class CreateOrderCheckAndUpdateProductResponse {
+  totalAmount: number;
+  status: string;
+  orderItems: Item[]
+}
+
+
+export class Item {
+  productId: number; 
+  quantity: number;
+  unitPrice: number
+}
+
+
+
   
   

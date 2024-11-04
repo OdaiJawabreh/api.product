@@ -4,7 +4,14 @@ import { In, Like, Repository } from "typeorm";
 import { Product } from "./entities/product.entity";
 import { CreateProductDto } from "./DTO/create-product.dto";
 import { FailureResponse, SuccessResponse } from "src/classes";
-import { CreateProductRequestWithOrdersDto, CreateProductResponseWithOrdersDto, GetProductsByIdsResponseDto, ProductData } from "./DTO/micro-scrives.dto";
+import {
+  CreateOrderCheckAndUpdateProductRequest,
+  CreateOrderCheckAndUpdateProductResponse,
+  CreateProductRequestWithOrdersDto,
+  CreateProductResponseWithOrdersDto,
+  GetProductsByIdsResponseDto,
+  ProductData,
+} from "./DTO/micro-scrives.dto";
 
 @Injectable()
 export class ProductService {
@@ -98,29 +105,84 @@ export class ProductService {
       return { ...new FailureResponse(), error_message: error };
     }
   }
-  async GetProductsByIds(data: { ids: number[] }): Promise< GetProductsByIdsResponseDto | FailureResponse> {
+  async GetProductsByIds(data: { ids: number[] }): Promise<GetProductsByIdsResponseDto | FailureResponse> {
     try {
       const { ids } = data;
 
       // Fetch products from the repository based on the provided IDs
       const products = await this.productRepository.find({ where: { id: In(ids) } });
-  
+
       // Map the fetched products to DTOs
-      const productDtos: ProductData[] = products.map(product => ({
+      const productDtos: ProductData[] = products.map((product) => ({
         id: +product.id,
         name: product.name,
-        description: product.description || '', // Default to empty string if null
+        description: product.description || "", // Default to empty string if null
         category: product.category,
         price: product.price,
         sku: product.sku,
         stock: product.stock,
       }));
-  
-      console.log({ products: productDtos});
-      
-      // Return the response DTO with the list of products
-      return { products: productDtos} ;
 
+      console.log({ products: productDtos });
+
+      // Return the response DTO with the list of products
+      return { products: productDtos };
+    } catch (error) {
+      return { ...new FailureResponse(), error_message: error };
+    }
+  }
+
+  async CreateOrderWithCheckProductUndUpdate(data: CreateOrderCheckAndUpdateProductRequest): Promise<CreateOrderCheckAndUpdateProductResponse | FailureResponse> {
+    try {
+      let { orderItems } = data;
+
+      // now i want to check if every item quantity is available
+      const ids = orderItems.map((el) => el.productId);
+      const currentProductData = await this.productRepository.find({ where: { id: In(ids) } });
+
+      const productArrayToUpdate = [];
+
+      const countOfStock = currentProductData.reduce((acc, product) => {
+        return product.stock + acc;
+      }, 0);
+
+      let status = countOfStock > 0 ? "Received" : "Rejected";
+      let totalAmount = 0;
+
+      if (status == "Rejected") {
+        orderItems = orderItems.map((el)=>{
+          return {
+            ...el,
+            quantity: 0
+          }
+        })
+      } else {
+        orderItems = orderItems.map((product) => {
+          const findProduct = currentProductData.find((el) => el.id == product.productId);
+
+          const isEnough = findProduct.stock >= product.quantity;
+          const realQuantityAvailable = isEnough ? product.quantity : findProduct.stock;
+
+          if (!isEnough) {
+            status = "Partial_receive";
+          }
+          totalAmount = totalAmount + (product.unitPrice * realQuantityAvailable)
+          // now i want to update product
+          const newQuantity = (findProduct.stock - realQuantityAvailable )
+           this.productRepository.update({id: product.productId},{stock: newQuantity})
+
+          return {
+            ...product,
+            quantity: realQuantityAvailable > 0 ? realQuantityAvailable : 0,
+          };
+        });
+      }
+
+      return {
+        totalAmount,
+        status,
+        orderItems
+      }
     } catch (error) {
       return { ...new FailureResponse(), error_message: error };
     }
