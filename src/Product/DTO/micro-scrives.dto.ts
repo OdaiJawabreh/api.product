@@ -18,4 +18,22 @@ export class CreateProductRequestWithOrdersDto {
     status: string;
   }
   
+
+// DTO for the response of getting products by IDs
+export class GetProductsByIdsResponseDto {
+  products: ProductData[];
+}
+
+// DTO representing individual product data
+export class ProductData {
+  id: number;
+  name: string;
+  description?: string;
+  category: string;
+  price: number;
+  sku: string;
+  stock: number;
+}
+  
+  
   

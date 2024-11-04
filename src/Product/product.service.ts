@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Like, Repository } from "typeorm";
+import { In, Like, Repository } from "typeorm";
 import { Product } from "./entities/product.entity";
 import { CreateProductDto } from "./DTO/create-product.dto";
 import { FailureResponse, SuccessResponse } from "src/classes";
-import { CreateProductRequestWithOrdersDto, CreateProductResponseWithOrdersDto } from "./DTO/create-product-with-order";
+import { CreateProductRequestWithOrdersDto, CreateProductResponseWithOrdersDto, GetProductsByIdsResponseDto, ProductData } from "./DTO/micro-scrives.dto";
 
 @Injectable()
 export class ProductService {
@@ -82,18 +82,44 @@ export class ProductService {
     try {
       const { name, description, category, sku, price, stock } = data;
 
-      const remainingStock = stock - data.quantity >= 0 ? stock - data.quantity : 0
-      const product = await this.productRepository.save({name, description, category, sku, price, stock: remainingStock});
+      const remainingStock = stock - data.quantity >= 0 ? stock - data.quantity : 0;
+      const product = await this.productRepository.save({ name, description, category, sku, price, stock: remainingStock });
 
-      const orderStatus = stock - data.quantity >= 0 ? 'Received' : 'Partial_receive'
+      const orderStatus = stock - data.quantity >= 0 ? "Received" : "Partial_receive";
       return {
-        clientCode : data.clientCode,
-        productId : product.id,
-        quantity : data.quantity,
-        unitPrice : price,
-        totalAmount : price * data.quantity,
-        status: orderStatus
-      }
+        clientCode: data.clientCode,
+        productId: product.id,
+        quantity: data.quantity,
+        unitPrice: price,
+        totalAmount: price * data.quantity,
+        status: orderStatus,
+      };
+    } catch (error) {
+      return { ...new FailureResponse(), error_message: error };
+    }
+  }
+  async GetProductsByIds(data: { ids: number[] }): Promise< GetProductsByIdsResponseDto | FailureResponse> {
+    try {
+      const { ids } = data;
+
+      // Fetch products from the repository based on the provided IDs
+      const products = await this.productRepository.find({ where: { id: In(ids) } });
+  
+      // Map the fetched products to DTOs
+      const productDtos: ProductData[] = products.map(product => ({
+        id: +product.id,
+        name: product.name,
+        description: product.description || '', // Default to empty string if null
+        category: product.category,
+        price: product.price,
+        sku: product.sku,
+        stock: product.stock,
+      }));
+  
+      console.log({ products: productDtos});
+      
+      // Return the response DTO with the list of products
+      return { products: productDtos} ;
 
     } catch (error) {
       return { ...new FailureResponse(), error_message: error };

@@ -6,49 +6,45 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { CreateProductDto } from "./DTO/create-product.dto";
 import { ProductService } from "./product.service";
 import { FailureResponse } from "src/classes";
-import { CreateProductRequestWithOrdersDto } from "./DTO/create-product-with-order";
+import { CreateProductRequestWithOrdersDto } from "./DTO/micro-scrives.dto";
 
 @Controller("product")
 export class ProductController {
-
   constructor(private readonly productService: ProductService) {}
 
   @Post()
-  create(@Body() createProductDto: Partial<CreateProductDto>){
+  create(@Body() createProductDto: Partial<CreateProductDto>) {
     return this.productService.create(createProductDto);
   }
 
-
   @Get()
-  getAllProducts(
-    @Query('limit') limit?: number,
-    @Query('offset') offset?: number,
-    @Query('key') key?: string,
-  ){
+  getAllProducts(@Query("limit") limit?: number, @Query("offset") offset?: number, @Query("key") key?: string) {
     return this.productService.getAllProducts(limit, offset, key);
   }
 
-  @Get('/:id')
-  getProduct(
-    @Param('id') id: string,
-  ){
+  @Get("/:id")
+  getProduct(@Param("id") id: string) {
     return this.productService.getProduct(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() createProductDto: Partial<CreateProductDto>) {
+  @Patch(":id")
+  update(@Param("id") id: string, @Body() createProductDto: Partial<CreateProductDto>) {
     return this.productService.update(+id, createProductDto);
   }
 
-  @Delete(':id')
-  delete(@Param('id') id: string) {
+  @Delete(":id")
+  delete(@Param("id") id: string) {
     return this.productService.delete(+id);
   }
   // microservices section
   @GrpcMethod("ProductService", "CreateProductWithOrders")
   async createProductWithOrders(data: CreateProductRequestWithOrdersDto) {
-    return this.productService.createProductWithOrders(data)
+    return this.productService.createProductWithOrders(data);
   }
 
- 
+  @GrpcMethod("ProductService", "GetProductsByIds")
+  async GetProductsByIds(data: { ids: number[] }) {
+    const x = await this.productService.GetProductsByIds(data);
+    return x;
+  }
 }
