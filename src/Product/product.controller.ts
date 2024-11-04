@@ -6,6 +6,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { CreateProductDto } from "./DTO/create-product.dto";
 import { ProductService } from "./product.service";
 import { FailureResponse } from "src/classes";
+import { CreateProductRequestWithOrdersDto } from "./DTO/create-product-with-order";
 
 @Controller("product")
 export class ProductController {
@@ -42,6 +43,11 @@ export class ProductController {
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.productService.delete(+id);
+  }
+  // microservices section
+  @GrpcMethod("ProductService", "CreateProductWithOrders")
+  async createProductWithOrders(data: CreateProductRequestWithOrdersDto) {
+    return this.productService.createProductWithOrders(data)
   }
 
  

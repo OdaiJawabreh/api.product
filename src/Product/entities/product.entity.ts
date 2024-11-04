@@ -39,6 +39,6 @@ export class Product {
   @Column({ type: 'varchar', length: 50, unique: true })
   sku: string;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'bigint', default: 0 })
   stock: number;
 }
