@@ -66,4 +66,6 @@ message CreateOrderWithCheckProductResponse {
   string status = 1;
   float totalAmount = 2;
   repeated Item orderItems = 3;
+  int64 clientCode = 4;
+
 }
