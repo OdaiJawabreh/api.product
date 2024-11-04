@@ -52,6 +52,7 @@ message Product {
 // Request message to create a order with check product and update orders
 message CreateOrderWithCheckProductRequest {
   repeated Item orderItems = 2;
+  int64 clientCode =1;
 }
 
 // Item message

@@ -134,7 +134,7 @@ export class ProductService {
 
   async CreateOrderWithCheckProductUndUpdate(data: CreateOrderCheckAndUpdateProductRequest): Promise<CreateOrderCheckAndUpdateProductResponse | FailureResponse> {
     try {
-      let { orderItems } = data;
+      let { orderItems, clientCode } = data;
 
       // now i want to check if every item quantity is available
       const ids = orderItems.map((el) => el.productId);
@@ -181,7 +181,8 @@ export class ProductService {
       return {
         totalAmount,
         status,
-        orderItems
+        orderItems,
+        clientCode
       }
     } catch (error) {
       return { ...new FailureResponse(), error_message: error };

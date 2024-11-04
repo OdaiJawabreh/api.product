@@ -37,13 +37,15 @@ export class ProductData {
 
 
 export class CreateOrderCheckAndUpdateProductRequest {
+  clientCode: number;
   orderItems: Item[]  
 }
 
 export class CreateOrderCheckAndUpdateProductResponse {
   totalAmount: number;
   status: string;
-  orderItems: Item[]
+  orderItems: Item[];
+  clientCode: number;
 }
 
 
